@@ -11,4 +11,8 @@ module Scripts
 
     def self.each(&block) = @@scripts.each(&block)
   end
+
+  PROJECT_ROOT = Pathname.new(__dir__).parent.parent.to_s
+
+  DB_FILES_DIR = File.join(PROJECT_ROOT, "temps")
 end
