@@ -9,16 +9,17 @@ class BookTracker < Scripts::Base
 
   def self.app_path = "/books"
 
-  on_start do
-    unless File.exist? "book.json"
-      f = File.new "book.json", "a"
-      f.puts "[]"
-      f.close
-    end
+  @@book_file = File.join(Scripts::DB_FILES_DIR, "book.json")
+
+  unless File.exist? @@book_file
+    puts "new book file made"
+    f = File.new @@book_file, "a"
+    f.puts "[]"
+    f.close
   end
 
   get "/" do
-    books_list = JSON.parse File.read("book.json")
+    books_list = JSON.parse File.read(@@book_file)
     erb :index, locals: { books_list: }
   end
 
@@ -28,11 +29,13 @@ class BookTracker < Scripts::Base
 
   post "/form" do
     params => { title:, review:, rating:, link:, is_link: }
-    review = { title:, review:, rating:, link:, is_link: }
+    review = { title:, review:, rating:, link:, is_link: is_link == "true" }
 
-    book_json = JSON.parse File.read("book.json")
+    p is_link
+
+    book_json = JSON.parse File.read(@@book_file)
     book_json.prepend(review)
-    File.write("book.json", book_json.to_json)
+    File.write(@@book_file, JSON.pretty_generate(book_json))
 
     redirect to("/")
   end
@@ -96,10 +99,12 @@ __END__
           <label>
             link or source
             <input type="textarea" name="link"/>
-            <label>
-              Is it a link?
-              <input type="checkbox" name="is_link"/>
-            </label>
+          </label>
+          <label>
+            Is it a link?
+            <input type="checkbox" name="is_link" value="true"/>
+            <input type="hidden"   name="is_link" value="false" />
+
           </label>
           <label oninput="ratingValue.value = rating.valueAsNumber">
             rating
