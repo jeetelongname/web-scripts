@@ -1,12 +1,13 @@
 #!/usr/bin/env ruby
 
-require 'sinatra/base'
+require "sinatra/base"
 
-class Test < Sinatra::Base
+class Test < Scripts::Base
+  register_script
 
-  def self.app_path = '/test'
+  def self.app_path = "/test"
 
-  get '/' do
-    'hello world'
+  get "/" do
+    "hello world"
   end
 end
